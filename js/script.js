@@ -323,3 +323,38 @@ function showthanksModal(message) {
     }, 4000);
 }
 
+// Slider 
+
+const slides = document.querySelectorAll(".offer__slide"),
+    numOfslides = slides.length,
+    sliderPrev = document.querySelector(".offer__slider-prev"),
+    sliderNext = document.querySelector(".offer__slider-next"),
+    current = document.querySelector("#current"),
+    total = document.querySelector("#total");
+
+let currentSlider = 1;
+total.innerHTML = getZero(numOfslides);
+
+slides.forEach(i => i.classList.add("hide", "fade"));
+current.innerHTML = getZero(currentSlider);
+
+function showSlide(n) {
+    if (n < 1) currentSlider = 4;
+    if (n > numOfslides) currentSlider = 1;
+    slides.forEach((slide, i) => {
+        if (i + 1 === currentSlider || !slide.classList.contains("hide")) {
+            slide.classList.toggle("hide");
+        }
+    });
+    current.innerHTML = getZero(currentSlider);
+}
+
+function changeSlide(n) {
+    showSlide(currentSlider += n);
+}
+
+sliderPrev.addEventListener("click", (e) => changeSlide(-1));
+
+sliderNext.addEventListener("click", (e) => changeSlide(1));
+
+showSlide(1);
