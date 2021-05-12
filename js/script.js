@@ -38,7 +38,7 @@ showTabContent();
 
 // Timer
 
-const deadline = "2021-05-05",
+const deadline = "2021-05-20",
     timer = ".timer";
 
 function getTimeRemaining(endtime) {
@@ -89,9 +89,8 @@ setClock(timer, deadline);
 // Modal
 
 const modalButtons = document.querySelectorAll("button[data-modal]"),
-    modal = document.querySelector("div.modal"),
-    modalClose = document.querySelector("div[data-modalClose]"),
-    modalTimerId = setTimeout(showModal, 20000);
+    modal = document.querySelector("div.modal");
+modalTimerId = setTimeout(showModal, 50000);
 
 
 function hideModal() {
@@ -121,10 +120,9 @@ modalButtons.forEach(button => {
     });
 });
 
-modalClose.addEventListener("click", hideModal);
 
 modal.addEventListener("click", (event) => {
-    if (event.target.classList.value === "modal show") {
+    if (event.target === modal || event.target.getAttribute("data-modalClose") == "") {
         hideModal();
     }
 });
@@ -158,7 +156,9 @@ class MenuCard {
 
     render() {
         const element = document.createElement("div");
-        if (this.classes.length === 0) {this.classes.push("menu__item");}
+        if (this.classes.length === 0) {
+            this.classes.push("menu__item");
+        }
         this.classes.forEach(classList => element.classList.add(classList));
         element.innerHTML = `
             <img src=${this.src} alt=${this.alt}>
@@ -172,31 +172,154 @@ class MenuCard {
         this.parent.append(element);
     }
 }
-new MenuCard(
-    "img/tabs/vegy.jpg",
-    "vegy",
-    'Меню "Фитнес"',
-    'Меню "Фитнес" - это новый подход к приготовлению блюд: больше свежих овощей и фруктов. Продукт активных и здоровых людей. Это абсолютно новый продукт с оптимальной ценой и высоким качеством!',
-    9,
-    '.menu .container'
-).render();
 
-new MenuCard(
-    "img/tabs/elite.jpg",
-    "elite",
-    'Меню "Премиум"',
-    'В меню “Премиум” мы используем не только красивый дизайн упаковки, но и качественное исполнение блюд. Красная рыба, морепродукты, фрукты - ресторанное меню без похода в ресторан!',
-    21,
-    '.menu .container',
-    "menu__item"
-).render();
+const getResourses = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+        throw new Error(`Couldn't fetch ${url}, status ${res.status}`);
+    }
+    return await res.json();
+};
 
-new MenuCard(
-    "img/tabs/post.jpg",
-    "post",
-    'Меню "Постное"',
-    'Меню “Постное” - это тщательный подбор ингредиентов: полное отсутствие продуктов животного происхождения, молоко из миндаля, овса, кокоса или гречки, правильное количество белков за счет тофу и импортных вегетарианских стейков.',
-    12,
-    '.menu .container',
-    "menu__item"
-).render();
+// getResourses("http://localhost:3000/menu")
+//     .then(data => {
+//         data.forEach(({
+//             img,
+//             altimg,
+//             title,
+//             descr,
+//             price
+//         }) => {
+//             new MenuCard(img, altimg, title, descr, price, '.menu .container')
+//                 .render();
+//         });
+//     });
+
+// getResourses("http://localhost:3000/menu")
+//     .then(data => createCard(data));
+
+
+// function createCard(data) {
+//     data.forEach(({
+//         img,
+//         altimg,
+//         title,
+//         descr,
+//         price
+//     }) => {
+//         const element = document.createElement("div");
+//         element.classList.add("menu__item");
+
+//         element.innerHTML = `
+//             <img src=${img} alt=${altimg}>
+//             <h3 class="menu__item-subtitle">${title}"</h3>
+//             <div class="menu__item-descr">${descr}</div>
+//             <div class="menu__item-divider"></div>
+//             <div class="menu__item-price">
+//                 <div class="menu__item-cost">Цена:</div>
+//                 <div class="menu__item-total"><span>${price}</span> грн/день</div>
+//             </div>`;
+//         document.querySelector(".menu .container").append(element);
+//     });
+// }
+
+axios.get("http://localhost:3000/menu")
+    .then(data => {
+        data.data.forEach(({
+            img,
+            altimg,
+            title,
+            descr,
+            price
+        }) => {
+            new MenuCard(img, altimg, title, descr, price, '.menu .container')
+                .render();
+        });
+    });
+
+// Forms
+
+const forms = document.querySelectorAll("form");
+
+const message = {
+    loading: "img/054 spinner.svg",
+    sucsess: "Спасибо! Мы с вами свяжемся.",
+    failure: "Что то пошло не так."
+};
+
+forms.forEach(item => bindPostData(item));
+
+const postData = async (url, data) => {
+    const res = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-type": "application/json"
+        },
+        body: data
+    });
+    return await res.json();
+};
+
+function bindPostData(form) {
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const statusMessage = document.createElement("img");
+        statusMessage.src = message.loading;
+        statusMessage.style.cssText = `
+            margin: 0 auto;
+            display: block;
+        `;
+
+        form.insertAdjacentElement("afterend", statusMessage);
+
+        const formData = new FormData(form);
+        const json = JSON.stringify(Object.fromEntries(formData.entries()));
+
+        // const object = {};
+        // formData.forEach((value, key) => object[key] = value);
+
+
+        // fetch("server.php", {
+        //         method: "POST",
+        //         headers: {
+        //             "Content-type": "application/json"
+        //         },
+        //         // body: formData
+        //         body: JSON.stringify(object)})
+        postData("http://localhost:3000/requests", json)
+            .then(data => {
+                console.log(data);
+                showthanksModal(message.sucsess);
+            }).catch(() => showthanksModal(message.failure)).finally(() => {
+                statusMessage.remove();
+                form.reset();
+            });
+    });
+}
+
+
+
+// ThanksModal
+
+function showthanksModal(message) {
+    const prevModalDialog = document.querySelector('.modal__dialog');
+    prevModalDialog.classList.add("hide");
+    showModal();
+
+    const thanksModal = document.createElement('div');
+    thanksModal.classList.add('modal__dialog');
+    thanksModal.innerHTML = `
+    <div class="modal__content">
+        <div data-modalClose class="modal__close">&times;</div>
+        <div class="modal__title">${message}</div>
+    </div>
+    `;
+    modal.append(thanksModal);
+    setTimeout(() => {
+        thanksModal.remove();
+        prevModalDialog.classList.remove("hide");
+        hideModal();
+    }, 4000);
+}
+
