@@ -330,31 +330,50 @@ const slides = document.querySelectorAll(".offer__slide"),
     sliderPrev = document.querySelector(".offer__slider-prev"),
     sliderNext = document.querySelector(".offer__slider-next"),
     current = document.querySelector("#current"),
-    total = document.querySelector("#total");
+    total = document.querySelector("#total"),
+    sliderWrapper = document.querySelector(".offer__slider-wrapper"),
+    sliderInner = document.querySelector(".offer__slider-inner"),
+    wrapperWidth = window.getComputedStyle(sliderWrapper).width;
 
-let currentSlider = 1;
-total.innerHTML = getZero(numOfslides);
+let offset = 0,
+    currentSlider = 1;
 
-slides.forEach(i => i.classList.add("hide", "fade"));
-current.innerHTML = getZero(currentSlider);
+    total.innerHTML = getZero(numOfslides);
+changeCurent();
 
-function showSlide(n) {
-    if (n < 1) currentSlider = 4;
-    if (n > numOfslides) currentSlider = 1;
-    slides.forEach((slide, i) => {
-        if (i + 1 === currentSlider || !slide.classList.contains("hide")) {
-            slide.classList.toggle("hide");
-        }
-    });
+sliderInner.style.width = 100 * numOfslides + "%";
+sliderInner.style.display = "flex";
+sliderInner.style.transition = "0.5s all";
+sliderWrapper.style.overflow = "hidden";
+slides.forEach(slide => {
+    slide.style.width = wrapperWidth;
+});
+
+function moveSlider() {
+    sliderInner.style.transform = `translateX(-${offset}px)`;
+    currentSlider = offset / parseInt(wrapperWidth) + 1;
     current.innerHTML = getZero(currentSlider);
 }
 
-function changeSlide(n) {
-    showSlide(currentSlider += n);
+function changeCurent() {
+    currentSlider = offset / parseInt(wrapperWidth) + 1;
+    current.innerHTML = getZero(currentSlider);
 }
+sliderNext.addEventListener("click", () => {
+    if (offset == parseInt(wrapperWidth) * (numOfslides - 1)) {
+        offset = 0;
+    } else {
+        offset += parseInt(wrapperWidth);
+    }
+    moveSlider();
+});
 
-sliderPrev.addEventListener("click", (e) => changeSlide(-1));
+sliderPrev.addEventListener("click", () => {
+    if (offset == 0) {
+        offset = parseInt(wrapperWidth) * (numOfslides - 1);
+    } else {
+        offset -= parseInt(wrapperWidth);
+    }
+    moveSlider();
+});
 
-sliderNext.addEventListener("click", (e) => changeSlide(1));
-
-showSlide(1);
