@@ -333,12 +333,14 @@ const slides = document.querySelectorAll(".offer__slide"),
     total = document.querySelector("#total"),
     sliderWrapper = document.querySelector(".offer__slider-wrapper"),
     sliderInner = document.querySelector(".offer__slider-inner"),
-    wrapperWidth = window.getComputedStyle(sliderWrapper).width;
+    wrapperWidth = window.getComputedStyle(sliderWrapper).width,
+    slider = document.querySelector(".offer__slider");
+
 
 let offset = 0,
     currentSlider = 1;
 
-    total.innerHTML = getZero(numOfslides);
+total.innerHTML = getZero(numOfslides);
 changeCurent();
 
 sliderInner.style.width = 100 * numOfslides + "%";
@@ -351,8 +353,8 @@ slides.forEach(slide => {
 
 function moveSlider() {
     sliderInner.style.transform = `translateX(-${offset}px)`;
-    currentSlider = offset / parseInt(wrapperWidth) + 1;
-    current.innerHTML = getZero(currentSlider);
+    changeCurent();
+    changeActiveDot();
 }
 
 function changeCurent() {
@@ -377,3 +379,31 @@ sliderPrev.addEventListener("click", () => {
     moveSlider();
 });
 
+slider.style.position = "relative";
+const dots = document.createElement("ol");
+dots.classList.add("carousel-indicators");
+slider.append(dots);
+
+function changeActiveDot() {
+    document.querySelector(".active__dot").classList.toggle("active__dot");
+    document.querySelector(`#dot__${currentSlider}`).classList.add("active__dot");
+}
+
+for (let i = 0; i < numOfslides; i++) {
+    const dot = document.createElement("li");
+    dot.classList.add("dot");
+    dot.setAttribute("id", `dot__${i + 1}`);
+    if (i + 1 === currentSlider) {
+        dot.classList.add("active__dot");
+    }
+    dots.append(dot);
+}
+dots.addEventListener("click", e => {
+    let classes = e.target.classList;
+    if (classes.contains("dot") && !classes.contains("active__dot")) {
+        const atr = e.target.getAttribute("id"),
+            id = +atr.slice(atr.length - 1);        
+        offset = (id - 1) * parseInt(wrapperWidth);
+        moveSlider();
+    }
+});
