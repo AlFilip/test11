@@ -23,4 +23,4 @@ function thanksModal() {
     }
 }
 
-module.exports = thanksModal;
+export default thanksModal;
