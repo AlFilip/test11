@@ -1,16 +1,28 @@
-function slider() {
-    // Slider 
+import {
+    getZero
+} from "./timer";
 
-    const slides = document.querySelectorAll(".offer__slide"),
+function slider({
+    slidesSelectors,
+    prevSelector,
+    nextSelector,
+    curentCountSelector,
+    totalCountSelector,
+    wrapperSelector,
+    innerSelector,
+    sliderSelector
+}) {
+    // Slider 
+    const slides = document.querySelectorAll(slidesSelectors),
         numOfslides = slides.length,
-        sliderPrev = document.querySelector(".offer__slider-prev"),
-        sliderNext = document.querySelector(".offer__slider-next"),
-        current = document.querySelector("#current"),
-        total = document.querySelector("#total"),
-        sliderWrapper = document.querySelector(".offer__slider-wrapper"),
-        sliderInner = document.querySelector(".offer__slider-inner"),
+        sliderPrev = document.querySelector(prevSelector),
+        sliderNext = document.querySelector(nextSelector),
+        current = document.querySelector(curentCountSelector),
+        total = document.querySelector(totalCountSelector),
+        sliderWrapper = document.querySelector(wrapperSelector),
+        sliderInner = document.querySelector(innerSelector),
         wrapperWidth = window.getComputedStyle(sliderWrapper).width,
-        slider = document.querySelector(".offer__slider");
+        slider = document.querySelector(sliderSelector);
 
     const strToNumber = (str) => +str.replace(/\D/g, "");
 

@@ -1,6 +1,5 @@
 function cards() {
     // menu cards
-
     class MenuCard {
         constructor(src, alt, title, description, price, parentSelector, ...classes) {
             this.src = src;
@@ -37,13 +36,6 @@ function cards() {
         }
     }
 
-    const getResourses = async (url) => {
-        const res = await fetch(url);
-        if (!res.ok) {
-            throw new Error(`Couldn't fetch ${url}, status ${res.status}`);
-        }
-        return await res.json();
-    };
     axios.get("http://localhost:3000/menu")
         .then(data => {
             data.data.forEach(({
